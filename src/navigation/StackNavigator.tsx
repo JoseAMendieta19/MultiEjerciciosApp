@@ -6,11 +6,11 @@ import IMCScreen from "../screens/IMCScreen";
 import DescuentoScreen from "../screens/DescuentoScreen";
 import MonedasScreen from "../screens/MonedasScreen";
 import HipotenusaScreen from "../screens/HipotenusaScreen";
-// import SignoNumeroScreen from "../screens/SignoNumeroScreen";
-// import OrdenarScreen from "../screens/OrdenarScreen";
-// import CuboScreen from "../screens/CuboScreen";
-// import PromedioScreen from "../screens/PromedioScreen";
-// import TaxiScreen from "../screens/TaxiScreen";
+import SignoNumeroScreen from "../screens/SignoNumeroScreen";
+import OrdenarScreen from "../screens/OrdenarScreen";
+import CuboScreen from "../screens/CuboScreen";
+import PromedioScreen from "../screens/PromedioScreen";
+import TaxiScreen from "../screens/TaxiScreen";
 
 import { RootStackParamList } from "../types/navigation";
 
@@ -25,11 +25,11 @@ export default function StackNavigator() {
         <Stack.Screen name="Descuento" component={DescuentoScreen} />
         <Stack.Screen name="Monedas" component={MonedasScreen} />
         <Stack.Screen name="Hipotenusa" component={HipotenusaScreen} />
-        {/* <Stack.Screen name="SignoNumero" component={SignoNumeroScreen} />
+        <Stack.Screen name="SignoNumero" component={SignoNumeroScreen} />
         <Stack.Screen name="Ordenar" component={OrdenarScreen} />
         <Stack.Screen name="Cubo" component={CuboScreen} />
         <Stack.Screen name="Promedio" component={PromedioScreen} />
-        <Stack.Screen name="Taxi" component={TaxiScreen} /> */}
+        <Stack.Screen name="Taxi" component={TaxiScreen} />
     </Stack.Navigator>
     );
 }
