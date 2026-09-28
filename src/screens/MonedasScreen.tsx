@@ -52,7 +52,7 @@ export default function MonedasScreen({ navigation }: Props) {
             key={t.codigo}
             onPress={() => setMonedaSeleccionada(t)}
             style={{
-                backgroundColor: monedaSeleccionada.codigo === t.codigo ? "#0056b3" : "#007bff"
+                backgroundColor: monedaSeleccionada.codigo === t.codigo ? "#ee8dae" : "#9b6a7a"
             }}
             >
             <ButtonText>{t.nombre} ({t.codigo})</ButtonText>
