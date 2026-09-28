@@ -7,44 +7,96 @@ import {
     Input,
     Button,
     ButtonText,
-    Result
-    } from "../components/Styled";
+    Result,
+    Label
+} from "../components/Styled";
 
-    type Props = {
+type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignoNumero">;
-    };
+};
 
 export default function SignoNumeroScreen({ navigation }: Props) {
     const [numero, setNumero] = useState("");
     const [resultado, setResultado] = useState<string | null>(null);
+    const [mensaje, setMensaje] = useState("");
 
     const verificar = () => {
-    const n = Number(numero);
-        if (n > 0) setResultado("El número es Positivo");
-        else if (n < 0) setResultado("El número es Negativo");
-        else setResultado("El número es Cero");
+        // Campo vacío
+        if (!numero.trim()) {
+            setMensaje("Ingrese un número.");
+            setResultado(null);
+            return;
+        }
+
+        const n = Number(numero);
+
+        // Validar número
+        if (Number.isNaN(n)) {
+            setMensaje("Ingrese un número válido.");
+            setResultado(null);
+            return;
+        }
+
+        // Determinar signo
+        if (n > 0) {
+            setResultado("El número es Positivo");
+        } else if (n < 0) {
+            setResultado("El número es Negativo");
+        } else {
+            setResultado("El número es Cero");
+        }
+
+        setMensaje("");
+    };
+
+    const limpiar = () => {
+        setNumero("");
+        setResultado(null);
+        setMensaje("");
     };
 
     return (
-    <Container>
-        <Title>Positivo o Negativo</Title>
+        <Container>
+            <Title>Positivo o Negativo</Title>
 
-        <Input
-            keyboardType="numeric"
-            value={numero}
-            onChangeText={setNumero}
-            placeholder="Ingrese un número"
-        />
+            <Label>Número</Label>
 
-        <Button onPress={verificar}>
-            <ButtonText>Verificar</ButtonText>
-        </Button>
+            <Input
+                keyboardType="numeric"
+                value={numero}
+                onChangeText={(texto) => {
+                    setNumero(texto);
+                    setResultado(null);
+                    setMensaje("");
+                }}
+                placeholder="Ingrese un número"
+                maxLength={10}
+            />
 
-        {resultado !== null && <Result>{resultado}</Result>}
+            <Button onPress={verificar}>
+                <ButtonText>Verificar</ButtonText>
+            </Button>
 
-        <Button onPress={() => navigation.goBack()}>
-            <ButtonText>Volver</ButtonText>
-        </Button>
+            <Button onPress={limpiar}>
+                <ButtonText>Limpiar</ButtonText>
+            </Button>
+
+            {mensaje !== "" && (
+                <Result>
+                    {mensaje}
+                </Result>
+            )}
+
+            {resultado !== null && (
+                <Result>
+                    {resultado}
+                </Result>
+            )}
+
+            <Button onPress={() => navigation.goBack()}>
+                <ButtonText>Volver</ButtonText>
+            </Button>
         </Container>
     );
 }
+

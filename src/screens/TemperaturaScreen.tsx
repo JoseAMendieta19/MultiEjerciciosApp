@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
+
 import {
     Container,
     Title,
@@ -8,7 +9,7 @@ import {
     Button,
     ButtonText,
     Result,
-    Label
+    Label,
 } from "../components/Styled";
 
 type Props = {
@@ -19,46 +20,87 @@ export default function TemperaturaScreen({ navigation }: Props) {
     const [valor, setValor] = useState("");
     const [resultado, setResultado] = useState<number | null>(null);
     const [modo, setModo] = useState<"CaF" | "FaC">("CaF");
+    const [mensaje, setMensaje] = useState("");
 
     const convertir = () => {
-    const num = Number(valor);
-    if (modo === "CaF") {
-      setResultado(num * 9 / 5 + 32);
-    } else {
-      setResultado((num - 32) * 5 / 9);
+    if (valor.trim() === "") {
+        setMensaje("Ingrese un valor de temperatura.");
+        setResultado(null);
+        return;
     }
+
+    const num = Number(valor);
+
+    if (isNaN(num)) {
+        setMensaje("Ingrese un valor de temperatura válido.");
+        setResultado(null);
+        return;
+    }
+
+    setMensaje("");
+
+    if (modo === "CaF") {
+        setResultado((num * 9) / 5 + 32);
+    } else {
+        setResultado(((num - 32) * 5) / 9);
+    }
+    };
+
+    const cambiarModo = () => {
+    setModo(modo === "CaF" ? "FaC" : "CaF");
+    setResultado(null);
+    setValor("");
+    };
+
+    const limpiar = () => {
+    setValor("");
+    setResultado(null);
+    setMensaje("");
     };
 
     return (
     <Container>
-        <Title>Celsius ↔ Fahrenheit</Title>
+        <Title>Conversor de Temperatura</Title>
 
         <Label>
-        Modo actual: {modo === "CaF" ? "Celsius → Fahrenheit" : "Fahrenheit → Celsius"}
+        {modo === "CaF"
+            ? "Celsius → Fahrenheit"
+            : "Fahrenheit → Celsius"}
         </Label>
 
-        <Button onPress={() => setModo(modo === "CaF" ? "FaC" : "CaF")}>
-        <ButtonText>Cambiar dirección</ButtonText>
+        <Button onPress={cambiarModo}>
+            <ButtonText>Cambiar dirección</ButtonText>
         </Button>
 
         <Input
-        keyboardType="numeric"
-        value={valor}
-        onChangeText={setValor}
-        placeholder={modo === "CaF" ? "Ingrese °C" : "Ingrese °F"}
+            keyboardType="numeric"
+            value={valor}
+            onChangeText={setValor}
+            placeholder={modo === "CaF" ? "Ingrese °C" : "Ingrese °F"}
+            maxLength={10}
         />
+        {mensaje !== "" && <Label>{mensaje}</Label>}
+        
 
         <Button onPress={convertir}>
-        <ButtonText>Convertir</ButtonText>
+            <ButtonText>Convertir</ButtonText>
         </Button>
 
         {resultado !== null && (
-        <Result>Resultado: {resultado.toFixed(2)} {modo === "CaF" ? "°F" : "°C"}</Result>
+            <Result>
+            {valor}°{modo === "CaF" ? "C" : "F"} ={" "}
+            {resultado.toFixed(2)}°{modo === "CaF" ? "F" : "C"}
+            </Result>
         )}
 
+        <Button onPress={limpiar}>
+            <ButtonText>Limpiar</ButtonText>
+        </Button>
+
         <Button onPress={() => navigation.goBack()}>
-        <ButtonText>Volver</ButtonText>
+            <ButtonText>Volver</ButtonText>
         </Button>
     </Container>
     );
 }
+

@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { StyleSheet } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Picker } from "@react-native-picker/picker";
+
 import { RootStackParamList } from "../types/navigation";
+
 import {
     Container,
     Title,
@@ -8,70 +12,244 @@ import {
     Button,
     ButtonText,
     Result,
-    Label
+    Label,
 } from "../components/Styled";
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList, "Monedas">;
 };
 
-// Tasas de cambio de ejemplo (respecto a 1 USD)
-const tasas: { nombre: string; codigo: string; valor: number }[] = [
-    { nombre: "Euro", codigo: "EUR", valor: 0.92 },
-    { nombre: "Libra Esterlina", codigo: "GBP", valor: 0.79 },
-    { nombre: "Yen Japonés", codigo: "JPY", valor: 149.5 },
-    { nombre: "Peso Colombiano", codigo: "COP", valor: 4050 },
-    { nombre: "Sol Peruano", codigo: "PEN", valor: 3.75 },
+// Tasas de cambio respecto a 1 USD
+const tasas: {
+    nombre: string;
+    codigo: string;
+    valor: number;
+}[] = [
+    {
+        nombre: "Dólar Estadounidense",
+        codigo: "USD",
+        valor: 1,
+    },
+    {
+        nombre: "Euro",
+        codigo: "EUR",
+        valor: 0.92,
+    },
+    {
+        nombre: "Yen Japonés",
+        codigo: "JPY",
+        valor: 149.5,
+    },
+    {
+        nombre: "Peso Colombiano",
+        codigo: "COP",
+        valor: 4050,
+    },
+    {
+        nombre: "Sol Peruano",
+        codigo: "PEN",
+        valor: 3.75,
+    },
 ];
 
 export default function MonedasScreen({ navigation }: Props) {
     const [monto, setMonto] = useState("");
-    const [monedaSeleccionada, setMonedaSeleccionada] = useState(tasas[0]);
-    const [resultado, setResultado] = useState<number | null>(null);
 
+    // Empiezan sin moneda seleccionada
+    const [monedaOrigen, setMonedaOrigen] = useState("");
+    const [monedaDestino, setMonedaDestino] = useState("");
+
+    const [resultado, setResultado] = useState<number | null>(null);
+    const [mensaje, setMensaje] = useState("");
+
+    // =========================
+    // CONVERTIR
+    // =========================
     const convertir = () => {
+        // Validar moneda de origen
+        if (!monedaOrigen) {
+            setMensaje("Seleccione la moneda de origen.");
+            setResultado(null);
+            return;
+        }
+
+        // Validar moneda de destino
+        if (!monedaDestino) {
+            setMensaje("Seleccione la moneda de destino.");
+            setResultado(null);
+            return;
+        }
+
+        // Validar monto vacío
+        if (!monto.trim()) {
+            setMensaje("Ingrese el monto.");
+            setResultado(null);
+            return;
+        }
+
         const m = Number(monto);
-        setResultado(m * monedaSeleccionada.valor);
+
+        // Validar monto
+        if (Number.isNaN(m) || m <= 0) {
+            setMensaje("Ingrese un monto válido mayor que 0.");
+            setResultado(null);
+            return;
+        }
+
+        const origen = tasas.find(
+            (t) => t.codigo === monedaOrigen
+        );
+
+        const destino = tasas.find(
+            (t) => t.codigo === monedaDestino
+        );
+
+        if (!origen || !destino) {
+            setMensaje("Seleccione monedas válidas.");
+            setResultado(null);
+            return;
+        }
+
+        // Misma moneda
+        if (origen.codigo === destino.codigo) {
+            setResultado(m);
+            setMensaje("");
+            return;
+        }
+
+        // Convertir primero a USD
+        const montoEnUSD = m / origen.valor;
+
+        // Convertir de USD a moneda destino
+        const resultadoFinal =
+            montoEnUSD * destino.valor;
+
+        setResultado(resultadoFinal);
+        setMensaje("");
+    };
+
+    // =========================
+    // LIMPIAR
+    // =========================
+    const limpiar = () => {
+        setMonto("");
+        setMonedaOrigen("");
+        setMonedaDestino("");
+        setResultado(null);
+        setMensaje("");
     };
 
     return (
-    <Container>
-        <Title>Conversor de Monedas</Title>
+        <Container>
+            <Title>Conversor de Monedas</Title>
 
-        <Label>Monto en USD ($)</Label>
-        <Input
-            keyboardType="numeric"
-            value={monto}
-            onChangeText={setMonto}
-            placeholder="Ej: 100"
-        />
+            {/* MONEDA DE ORIGEN */}
+            <Label>Moneda de origen:</Label>
 
-        <Label>Selecciona la moneda destino:</Label>
-        {tasas.map((t) => (
-            <Button
-            key={t.codigo}
-            onPress={() => setMonedaSeleccionada(t)}
-            style={{
-                backgroundColor: monedaSeleccionada.codigo === t.codigo ? "#ee8dae" : "#9b6a7a"
-            }}
+            <Picker
+                style={styles.picker}
+                selectedValue={monedaOrigen}
+                onValueChange={(codigo) => {
+                    setMonedaOrigen(codigo);
+                    setResultado(null);
+                    setMensaje("");
+                }}
             >
-            <ButtonText>{t.nombre} ({t.codigo})</ButtonText>
-        </Button>
-        ))}
+                <Picker.Item
+                    label="Seleccione una moneda"
+                    value=""
+                />
 
-        <Button onPress={convertir}>
-            <ButtonText>Convertir</ButtonText>
-        </Button>
+                {tasas.map((t) => (
+                    <Picker.Item
+                        key={t.codigo}
+                        label={`${t.nombre} (${t.codigo})`}
+                        value={t.codigo}
+                    />
+                ))}
+            </Picker>
 
-        {resultado !== null && (
-            <Result>
-            {monto} USD = {resultado.toFixed(2)} {monedaSeleccionada.codigo}
-            </Result>
-        )}
+            {/* MONTO */}
+            <Label>Monto:</Label>
 
-        <Button onPress={() => navigation.goBack()}>
-            <ButtonText>Volver</ButtonText>
-        </Button>
+            <Input
+                keyboardType="decimal-pad"
+                value={monto}
+                onChangeText={(texto) => {
+                    setMonto(texto);
+                    setResultado(null);
+                    setMensaje("");
+                }}
+                placeholder="Ej: 100"
+                maxLength={10}
+            />
+
+            {/* MONEDA DE DESTINO */}
+            <Label>Moneda de destino:</Label>
+
+            <Picker
+                style={styles.picker}
+                selectedValue={monedaDestino}
+                onValueChange={(codigo) => {
+                    setMonedaDestino(codigo);
+                    setResultado(null);
+                    setMensaje("");
+                }}
+            >
+                <Picker.Item
+                    label="Seleccione una moneda"
+                    value=""
+                />
+
+                {tasas.map((t) => (
+                    <Picker.Item
+                        key={t.codigo}
+                        label={`${t.nombre} (${t.codigo})`}
+                        value={t.codigo}
+                    />
+                ))}
+            </Picker>
+
+            {/* CONVERTIR */}
+            <Button onPress={convertir}>
+                <ButtonText>Convertir</ButtonText>
+            </Button>
+
+            {/* LIMPIAR */}
+            <Button onPress={limpiar}>
+                <ButtonText>Limpiar</ButtonText>
+            </Button>
+
+            {/* MENSAJE */}
+            {mensaje !== "" && (
+                <Result>
+                    {mensaje}
+                </Result>
+            )}
+
+            {/* RESULTADO */}
+            {resultado !== null && (
+                <Result>
+                    {monto} {monedaOrigen} ={"\n"}
+                    {resultado.toFixed(2)} {monedaDestino}
+                </Result>
+            )}
+
+            {/* VOLVER */}
+            <Button onPress={() => navigation.goBack()}>
+                <ButtonText>Volver</ButtonText>
+            </Button>
         </Container>
     );
 }
+
+// =========================
+// ESTILOS DEL PICKER
+// =========================
+
+const styles = StyleSheet.create({
+    picker: {
+        width: "100%",
+        height: 55,
+    },
+});
