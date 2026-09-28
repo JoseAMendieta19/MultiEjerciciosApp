@@ -43,8 +43,9 @@ export const ButtonText = styled.Text`
 `;
 
 export const Result = styled.Text`
-    font-size: 22px;
-    margin-top: 20px;
+    font-size: 18px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     text-align: center;
     font-weight: 600;
     color: #6d5a6e;

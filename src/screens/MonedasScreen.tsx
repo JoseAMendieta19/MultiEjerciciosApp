@@ -230,8 +230,7 @@ export default function MonedasScreen({ navigation }: Props) {
             {/* RESULTADO */}
             {resultado !== null && (
                 <Result>
-                    {monto} {monedaOrigen} ={"\n"}
-                    {resultado.toFixed(2)} {monedaDestino}
+                    {monto} {monedaOrigen} = {resultado.toFixed(2)} {monedaDestino}
                 </Result>
             )}
 
