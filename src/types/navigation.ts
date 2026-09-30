@@ -10,4 +10,7 @@ export type RootStackParamList = {
     Cubo: undefined;
     Promedio: undefined;
     Taxi: undefined;
+    Extra1: undefined;
+    Extra2: undefined;   
+    Extra3: undefined;
 };

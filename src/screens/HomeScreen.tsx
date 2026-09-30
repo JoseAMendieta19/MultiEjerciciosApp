@@ -28,6 +28,9 @@ const ejercicios: {
   { label: "8. Cubo de un Número", icon: "", route: "Cubo" },
   { label: "9. Promedio de 3 Números", icon: "", route: "Promedio" },
   { label: "10. Tarifa de Taxi", icon: "", route: "Taxi" },
+  { label: "11. Conversor de Distancia", icon: "", route: "Extra1" },
+  { label: "12. Conversor de Volumen", icon: "", route: "Extra2" },
+  { label: "13. Conversor de Peso", icon: "", route: "Extra3" },
 ];
 
 export default function HomeScreen({ navigation }: Props) {
